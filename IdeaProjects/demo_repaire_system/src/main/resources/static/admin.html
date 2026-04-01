@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>管理端</title>
+    <style>
+        .btn { padding: 10px 16px; margin: 8px; border:none; border-radius:6px; cursor:pointer; background:#409eff; color:#fff; font-size:16px; }
+    </style>
+</head>
+<body style="padding:20px">
+
+<h2 id="welcome"></h2>
+<button class="btn" onclick="location.href='all-orders.html'">报修单管理</button>
+<button class="btn" onclick="location.href='change-pwd.html'">修改密码</button>
+
+<script>
+    let username = localStorage.getItem("username") || "管理员";
+    document.getElementById("welcome").innerText = "欢迎你，" + username;
+</script>
+
+</body>
+</html>

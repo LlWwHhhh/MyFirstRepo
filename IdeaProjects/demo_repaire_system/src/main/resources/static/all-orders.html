@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>报修单管理</title>
+  <script src="auth.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    .bar{ margin:20px; text-align:center; }
+    .btn{ padding:8px 14px; margin:0 6px; border:none; border-radius:6px; cursor:pointer; }
+    .all{ background:#409eff; color:#fff; }
+    .ing{ background:#ff9f00; color:#fff; }
+    .done{ background:#00c48c; color:#fff; }
+    .del{ background:#ff4444; color:#fff; }
+    .up{ background:#20c997; color:#fff; }
+    table{ border-collapse:collapse; width:95%; margin:20px auto; }
+    th,td{ border:1px solid #ddd; padding:10px; text-align:center; }
+    img{ max-width:80px; max-height:80px; border-radius:4px; object-fit:cover; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="bar">
+    <button class="btn all" @click="load('all')">全部</button>
+    <button class="btn ing" @click="load('pending')">待处理</button>
+    <button class="btn done" @click="load('completed')">已处理</button>
+  </div>
+
+  <table>
+    <tr>
+      <th>学号</th>
+      <th>宿舍</th>
+      <th>问题</th>
+      <th>状态</th>
+      <th>图片</th>
+      <th>操作</th>
+    </tr>
+    <tr v-for="o in list">
+      <td>{{ o.studentAccount }}</td>
+      <td>{{ o.dormBuilding }} {{ o.dormRoom }}</td>
+      <td>{{ o.problem }}</td>
+      <td>{{ o.status }}</td>
+      <td>
+        <!-- 强制显示图片：只要imagePath有值，就补全完整URL -->
+        <template v-if="o.imagePath && o.imagePath.trim() !== ''">
+          <img :src="'http://localhost:8080' + o.imagePath" alt="报修图片" @error="console.log('图片加载失败：', $event)">
+        </template>
+        <span v-else>无图片</span>
+      </td>
+      <td>
+        <button class="btn up" @click="up(o.id)" v-if="o.status === '待处理'">已处理</button>
+        <button class="btn del" @click="del(o.id)">删除</button>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<script>
+  const { createApp } = Vue;
+  createApp({
+    data() { return { list: [] } },
+    methods: {
+      async load(type) {
+        let url = type === 'all' ? '/repair/all' :
+                type === 'pending' ? '/repair/pending' : '/repair/completed';
+        const res = await request(url);
+        this.list = await res.json();
+      },
+      async up(id) {
+        const res = await request(`/repair/updateStatus?id=${id}&status=已处理`);
+        const result = await res.json();
+        alert(result.msg);
+        this.load('all');
+      },
+      async del(id) {
+        if(!confirm("确定删除？")) return;
+        try {
+          // 2. 后端需要 confirm 参数，这里加上 &confirm=true
+          const res = await request(`/repair/deleteByAdmin?id=${id}&confirm=true`);
+
+          // 3. 解析后端返回的 JSON（现在后端返回 Result，不会报错）
+          const result = await res.json();
+
+          // 4. 提示消息 + 刷新列表
+          alert(result.msg);
+          this.load('all');
+        } catch (e) {
+          alert("删除失败：服务器异常");
+        }
+      }
+    },
+    mounted() { this.load('all'); }
+  }).mount('#app');
+</script>
+</body>
+</html>

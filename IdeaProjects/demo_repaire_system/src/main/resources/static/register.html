@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>用户注册</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    .box { max-width: 380px; margin: 80px auto; padding: 25px; border: 1px solid #ddd; border-radius: 8px; }
+    .btn { padding: 8px 16px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-primary { background: #409eff; color: white; }
+    input { width: 100%; margin: 8px 0; padding: 8px; box-sizing: border-box; }
+    .tip { color: #666; font-size: 13px; margin: 4px 0 12px 0; }
+  </style>
+</head>
+<body>
+<div id="app" class="box">
+  <h2>用户注册</h2>
+  <input v-model="account" placeholder="账号（学生3125/3225开头，教职工0025开头）">
+  <input v-model="username" placeholder="姓名">
+  <input type="password" v-model="password" placeholder="密码">
+  <input type="password" v-model="confirmPwd" placeholder="确认密码">
+
+  <!-- 新增楼栋和宿舍号输入框 -->
+  <input v-model="dormBuilding" placeholder="楼栋（如：1栋）">
+  <input v-model="dormRoom" placeholder="房间号（如：101）">
+  <div class="tip">* 教职工无需填写楼栋和宿舍号</div>
+
+  <button class="btn btn-primary" @click="register">注册</button>
+  <button class="btn" onclick="location.href='login.html'">返回登录</button>
+</div>
+
+<script>
+  const { createApp } = Vue;
+  createApp({
+    data() {
+      return {
+        account: '',username: '',password: '',confirmPwd: '',dormBuilding: '',dormRoom: ''
+      }
+    },
+    methods: {
+      async register() {
+        let role = this.account.startsWith('0025') ? 2 : 1;
+        if (role === 2) { this.dormBuilding = ''; this.dormRoom = ''; }
+        const res = await fetch(`/user/register?role=${role}&account=${this.account}&password=${this.password}&username=${this.username}&confirmPwd=${this.confirmPwd}&dormBuilding=${this.dormBuilding}&dormRoom=${this.dormRoom}`);
+        const result = await res.json();
+        alert(result.msg);
+        if (result.includes('成功')) location.href = 'login.html';
+      }
+    }
+  }).mount('#app');
+</script>
+</body>
+</html>

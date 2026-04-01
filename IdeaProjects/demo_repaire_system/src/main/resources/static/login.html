@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>.box{max-width:350px;margin:80px auto;padding:20px;border:1px solid #ddd;border-radius:8px}.btn{padding:8px 16px;margin:5px;border:none;border-radius:4px;cursor:pointer}.btn-primary{background:#409eff;color:#fff}input{width:100%;margin:8px 0;padding:8px;box-sizing:border-box}</style>
+</head>
+<body>
+<div id="app" class="box">
+    <h2>宿舍报修系统登录</h2>
+    <input v-model="account" placeholder="账号">
+    <input type="password" v-model="password" placeholder="密码">
+    <button class="btn btn-primary" @click="login">登录</button>
+    <button class="btn" onclick="location.href='register.html'">注册</button>
+</div>
+<script>
+    const { createApp } = Vue;
+    createApp({
+        data() {
+            return { account: "", password: "" }
+        },
+        methods: {
+            async login() {
+                const role = this.account.startsWith("0025") ? 2 : 1;
+
+                // 发送登录请求
+                const res = await fetch(`/user/login?role=${role}&account=${this.account}&password=${this.password}`,{
+                method:"POST"
+                });
+                const result = await res.json();
+
+                // 看后端返回了什么
+                console.log("后端完整返回：", result);
+                console.log("success值：", result.success, "msg值：", result.msg);
+
+                if (result.success) {
+                    alert("登录成功");
+                    // JWT
+                    // 把后端返回的 token 存到浏览器
+                    localStorage.setItem("token", result.token);
+
+                    localStorage.setItem("account", this.account);
+                    localStorage.setItem("role", role);
+                    localStorage.setItem("username", result.user.username);
+
+                    role === 1 ? location.href = "student.html" : location.href = "admin.html";
+                } else {
+                    alert(result.msg || "登录失败，请检查账号密码");
+                }
+            }
+        }
+    }).mount("#app")
+</script>
+</body>
+</html>

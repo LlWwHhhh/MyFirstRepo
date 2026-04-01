@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>修改密码</title>
+    <script src="auth.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>.box{max-width:360px;margin:80px auto;padding:20px;border:1px solid #ddd;border-radius:8px}.btn{padding:8px 16px;background:#409eff;color:#fff;border:none;border-radius:4px;cursor:pointer}input{width:100%;margin:10px 0;padding:8px}</style>
+</head>
+<body>
+<div id="app" class="box">
+    <h2>修改密码</h2>
+    <input type="password" v-model="oldPwd" placeholder="旧密码">
+    <input type="password" v-model="newPwd" placeholder="新密码">
+    <button class="btn" @click="save">确认修改</button>
+</div>
+<script>
+    const{createApp}=Vue;
+    const account=localStorage.getItem("account");
+    createApp({
+        data(){
+            return{oldPwd:"",newPwd:""}
+        },
+        methods:{
+            async save(){
+                let account = localStorage.getItem("account");
+                let res = await request(`/user/updatePwd?account=${account}&oldPwd=${this.oldPwd}&newPwd=${this.newPwd}`);
+                let result = await res.json();
+                alert(result.msg);
+                location.href = "student.html";
+            }
+        }
+    }).mount("#app")
+</script>
+</body>
+</html>

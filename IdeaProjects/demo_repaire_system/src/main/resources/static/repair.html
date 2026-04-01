@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>提交报修</title>
+    <script src="auth.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>.box{max-width:500px;margin:50px auto;padding:20px;border:1px solid #ddd;border-radius:8px}textarea{width:100%;height:90px;margin:10px 0;padding:8px}.btn{padding:10px;background:#409eff;color:#fff;border:none;border-radius:6px;cursor:pointer}img{max-width:200px;margin:10px 0}</style>
+</head>
+<body>
+<div id="app" class="box">
+    <h2>提交报修单</h2>
+    <textarea v-model="problem" placeholder="问题描述"></textarea>
+    <input type="file" @change="upload" accept="image/*">
+    <img v-if="image" :src="image">
+    <button class="btn" @click="submit">提交报修</button>
+</div>
+<script>
+    const { createApp } = Vue;
+    const account = localStorage.getItem("account");
+
+    createApp({
+        data() {
+            return { problem: "", image: "" }
+        },
+        methods: {
+            async upload(e) {
+                const file = e.target.files[0];
+                // 没选图片 → 直接退出，不发请求
+                if (!file) {
+                    this.image = "";
+                    return;
+                }
+
+                try {
+                    const formData = new FormData();
+                    formData.append("file", file);
+
+                    // ✅ 只用 fetch，不使用你的 request 工具
+                    const res = await fetch("/api/file/upload", {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    const data = await res.json();
+                    this.image = data.url || "";
+                } catch (err) {
+                    alert("图片上传失败");
+                    this.image = "";
+                }
+            },
+
+            async submit() {
+                if(!this.problem){ alert("请输入问题描述"); return; }
+
+                const account = localStorage.getItem("account");
+
+                // 先拿宿舍信息
+                const dormRes = await request(`/user/getDorm?account=${account}`);
+                const dorm = await dormRes.json();
+
+                if (!dorm || !dorm.dormBuilding) {
+                    alert("❌ 请先绑定宿舍！");
+                    return;
+                }
+
+                const image = this.image || "";
+
+                const submitRes = await request(
+                    `/repair/add?studentAccount=${account}` +
+                    `&problem=${encodeURIComponent(this.problem)}` +
+                    `&imagePath=${encodeURIComponent(image)}` + // ✅ 这里修复
+                    `&dormBuilding=${dorm.dormBuilding}` +
+                    `&dormRoom=${dorm.dormRoom}`
+                );
+
+                const result = await submitRes.json();
+                alert(result.msg);
+                location.href = "student.html";
+            }
+        },
+        mounted() { if (!account) location.href = "login.html"; }
+    }).mount("#app");
+</script>
+</body>
+</html>

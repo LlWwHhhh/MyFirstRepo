@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>学生中心</title>
+    <style>
+        .btn { padding: 10px 16px; margin: 8px; border-radius: 6px; background: #409eff; color: #fff; border: none; cursor: pointer; font-size: 16px; }
+    </style>
+</head>
+<body style="padding:20px">
+<h2 id="welcome"></h2>
+<button onclick="location.href='update-dorm.html'">绑定/修改宿舍</button>
+<button onclick="location.href='repair.html'">创建报修单</button>
+<button onclick="location.href='my-order.html'">我的报修单</button>
+<button onclick="location.href='change-pwd.html'">修改密码</button>
+
+<script>
+    let username = localStorage.getItem("username");
+    document.getElementById("welcome").textContent = "欢迎你，" + username;
+</script>
+</body>
+</html>

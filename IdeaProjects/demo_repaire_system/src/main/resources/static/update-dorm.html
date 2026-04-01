@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>修改宿舍</title>
+    <script src="auth.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>.box{max-width:400px;margin:50px auto;padding:20px;border:1px solid #ddd;border-radius:8px}.btn{padding:8px 16px;margin:5px;border:none;border-radius:4px;cursor:pointer}.btn-primary{background:#409eff;color:#fff}input{width:100%;margin:8px 0;padding:8px;box-sizing:border-box}</style>
+</head>
+<body>
+<div id="app" class="box">
+    <h2>绑定/修改宿舍</h2>
+    <input v-model="dormBuilding" placeholder="楼栋">
+    <input v-model="dormRoom" placeholder="房间号">
+    <button class="btn btn-primary" @click="save">保存</button>
+</div>
+<script>
+    const{createApp}=Vue;
+    const account=localStorage.getItem("account");
+    createApp({
+        data(){return{dormBuilding:"",dormRoom:""}},
+        methods:{
+            async save(){
+                const res=await request(`/user/update-dorm?account=${account}&newDormBuilding=${this.dormBuilding}&newDormRoom=${this.dormRoom}`);
+                const result = await res.json();
+                alert(result.msg);
+                location.href="student.html";
+            }
+        },
+        mounted(){!account&&(location.href="login.html")}
+    }).mount("#app")
+</script>
+</body>
+</html>
