@@ -5,7 +5,7 @@ import com.example.demo_repaire_system.entity.User;
 
 public interface UserService {
     //注册
-    String register(Integer role, String account, String password, String username, String dormBuilding, String dormRoom, String confirmPwd);
+    Result register(Integer role, String account, String password, String username, String dormBuilding, String dormRoom, String confirmPwd);
     //登录
     Result login(Integer role, String account, String password);
     //修改密码

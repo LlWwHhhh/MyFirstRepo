@@ -44,7 +44,8 @@
         const res = await fetch(`/user/register?role=${role}&account=${this.account}&password=${this.password}&username=${this.username}&confirmPwd=${this.confirmPwd}&dormBuilding=${this.dormBuilding}&dormRoom=${this.dormRoom}`);
         const result = await res.json();
         alert(result.msg);
-        if (result.includes('成功')) location.href = 'login.html';
+        //if (result.includes('成功')) location.href = 'login.html';
+        if (result.msg.includes('成功')) location.href = 'login.html';
       }
     }
   }).mount('#app');

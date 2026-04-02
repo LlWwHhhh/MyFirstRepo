@@ -19,7 +19,7 @@ public class UserController {
     //注册
     @GetMapping("/register")
     @ResponseBody
-    public String register(
+    public Result register(
             @RequestParam Integer role,         // 角色 1学生 2管理员
             @RequestParam String account,       // 学号/工号
             @RequestParam String password,      // 密码
@@ -29,7 +29,7 @@ public class UserController {
             @RequestParam String confirmPwd     // 确认密码
     ){
         if (!password.equals(confirmPwd)) {
-            return "两次密码不一致！";
+            return Result.fail("两次密码不一致！");
         }
         return userService.register(role, account, password, username, dormBuilding, dormRoom, confirmPwd);
     }

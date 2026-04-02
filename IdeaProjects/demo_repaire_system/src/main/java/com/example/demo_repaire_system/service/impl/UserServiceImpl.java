@@ -27,28 +27,28 @@ public class UserServiceImpl implements UserService{
      */
     @Transactional
     @Override
-    public String register(Integer role, String account, String password, String username, String dormBuilding, String dormRoom, String confirmPwd) {
-        if (account == null || account.isEmpty()) return "❌ 账号不能为空！";
-        if (password == null || password.isEmpty()) return "❌ 密码不能为空！";
-        if (username == null || username.isEmpty()) return "❌ 请输入姓名！";
-        if (!password.equals(confirmPwd)) return "❌ 两次密码不一致！";
+    public Result register(Integer role, String account, String password, String username, String dormBuilding, String dormRoom, String confirmPwd) {
+        if (account == null || account.isEmpty()) return Result.fail("❌ 账号不能为空！");
+        if (password == null || password.isEmpty()) return Result.fail("❌ 密码不能为空！");
+        if (username == null || username.isEmpty()) return Result.fail("❌ 请输入姓名！");
+        if (!password.equals(confirmPwd)) return Result.fail("❌ 两次密码不一致！");
 
         UserService userService;
 
         if (role == 1) {
             if (!RegexUtil.isStudentAccount(account)) {
-                return "❌ 学生学号格式错误！";
+                return Result.fail("❌ 学生学号格式错误！");
             }
-            if (dormBuilding == null || dormBuilding.isEmpty()) return "❌ 请输入楼栋！";
-            if (dormRoom == null || dormRoom.isEmpty()) return "❌ 请输入房间号！";
+            if (dormBuilding == null || dormBuilding.isEmpty()) return Result.fail("❌ 请输入楼栋！");
+            if (dormRoom == null || dormRoom.isEmpty()) return Result.fail("❌ 请输入房间号！");
         }else{
             if (!RegexUtil.isAdminAccount(account)) {
-                return "❌ 教职工号格式错误！";
+                return Result.fail("❌ 教职工号格式错误！");
             }
         }
 
         User existUser = userMapper.selectUserByAccount(account);
-        if(existUser != null)return "账号已存在！";
+        if(existUser != null)return Result.fail("账号已存在！");
 
         User user = new User();
         user.setAccount(account);
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService{
         }
 
         userMapper.insertUser(user);
-        return "注册成功！";
+        return Result.success("注册成功！");
     }
 
     /**
